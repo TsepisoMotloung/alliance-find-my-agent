@@ -16,7 +16,7 @@ export const authOptions: NextAuthOptions = {
         try {
           // Ensure database connection
           await initializeDatabase();
-          
+
           if (!credentials?.email || !credentials?.password) {
             throw new Error("Invalid credentials");
           }
@@ -109,7 +109,9 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
     maxAge: 24 * 60 * 60, // 24 hours
   },
-  secret: process.env.NEXTAUTH_SECRET || "beDpfsDMdR7GRKaFVXuGSvqmJoks+A0LIiWxtN+nVIw=",
+  secret:
+    process.env.NEXTAUTH_SECRET ||
+    "d4c3c136e68cb3422e5837236407117740b53fb551e0ce46003c29c2eb8eb96e",
   debug: process.env.NODE_ENV === "development",
 };
 
