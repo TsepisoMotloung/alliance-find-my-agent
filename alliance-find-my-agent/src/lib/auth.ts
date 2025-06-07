@@ -1,9 +1,8 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import User from "@/models/user";
-import Agent from "@/models/agent";
-import Employee from "@/models/employee";
+import { User, Agent, Employee } from "@/models";
 import { ApprovalStatus, UserRole } from "@/types/models";
+import { initializeDatabase } from "@/lib/db/modelUtils";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -15,6 +14,9 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         try {
+          // Ensure database connection
+          await initializeDatabase();
+          
           if (!credentials?.email || !credentials?.password) {
             throw new Error("Invalid credentials");
           }
