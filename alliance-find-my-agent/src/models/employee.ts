@@ -78,7 +78,4 @@ Employee.init(
   },
 );
 
-// Define association
-Employee.belongsTo(User, { foreignKey: "userId", as: "user" });
-
 export default Employee;

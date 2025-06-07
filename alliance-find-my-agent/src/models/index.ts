@@ -1,3 +1,4 @@
+
 import User from "./user";
 import Agent from "./agent";
 import Employee from "./employee";
@@ -33,8 +34,8 @@ User.hasMany(Complaint, {
   constraints: false,
 });
 
-Agent.hasMany(Callback, { foreignKey: "agentId", as: "callbacks" });
 Agent.belongsTo(User, { foreignKey: "userId", as: "user" });
+Agent.hasMany(Callback, { foreignKey: "agentId", as: "callbacks" });
 
 Employee.belongsTo(User, { foreignKey: "userId", as: "user" });
 

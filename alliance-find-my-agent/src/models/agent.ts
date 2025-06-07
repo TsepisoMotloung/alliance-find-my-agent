@@ -116,7 +116,4 @@ Agent.init(
   },
 );
 
-// Define association
-Agent.belongsTo(User, { foreignKey: "userId", as: "user" });
-
 export default Agent;
