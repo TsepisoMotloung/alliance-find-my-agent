@@ -10,6 +10,7 @@ export async function GET(request: NextRequest) {
     const radiusString = searchParams.get("radius");
     const limitString = searchParams.get("limit");
 
+    console.log(latString, lngString, radiusString, limitString);
     // Validate latitude and longitude
     if (!latString || !lngString) {
       return NextResponse.json(

@@ -26,6 +26,14 @@ export default async function AgentLocationPage() {
       redirect("/login");
     }
 
+    // Helper function to safely convert to ISO string
+    const toISOStringSafe = (date: string | number | Date | undefined) => {
+      if (!date) return undefined;
+      if (date instanceof Date) return date.toISOString();
+      if (typeof date === 'string') return date;
+      return new Date(date).toISOString();
+    };
+
     return (
       <MainLayout>
         <div className="py-8 sm:py-12">
@@ -43,7 +51,7 @@ export default async function AgentLocationPage() {
               agentId={agent.id}
               currentLatitude={agent.latitude}
               currentLongitude={agent.longitude}
-              locationUpdatedAt={agent.locationUpdatedAt?.toISOString()}
+              locationUpdatedAt={toISOStringSafe(agent.locationUpdatedAt)}
               isAvailable={agent.isAvailable}
             />
           </div>

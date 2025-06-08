@@ -117,3 +117,4 @@ Agent.init(
 );
 
 export default Agent;
+export {Agent};

@@ -79,21 +79,26 @@ const AgentMap: React.FC<AgentMapProps> = ({
   onRequestCallback,
   onViewRatings,
 }) => {
-  const [map, setMap] = useState<L.Map | null>(null);
+  const [mapKey, setMapKey] = useState(0);
 
   // Fix Leaflet icon issue on component mount
   useEffect(() => {
     fixLeafletIcon();
   }, []);
 
+  // Reset map key when userLocation changes to force remount
+  useEffect(() => {
+    setMapKey(prev => prev + 1);
+  }, [userLocation]);
+
   // Show user's location and available agents on the map
   return (
     <div className="w-full h-[600px] rounded-lg overflow-hidden shadow-md">
       <MapContainer
+        key={mapKey} // This forces a new map instance
         center={userLocation}
         zoom={13}
         style={{ height: "100%", width: "100%" }}
-        whenCreated={setMap}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

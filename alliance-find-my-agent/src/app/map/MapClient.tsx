@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import Button from "@/components/ui/Button";
@@ -38,13 +38,40 @@ interface Agent {
 
 const MapClient: React.FC = () => {
   const router = useRouter();
-  const [userLocation, setUserLocation] = useState<[number, number] | null>(
-    null,
-  );
+  const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   const [agents, setAgents] = useState<Agent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [radius, setRadius] = useState(10); // Default 10km
+  const [isLocationLoaded, setIsLocationLoaded] = useState(false);
+
+  // Fetch nearby agents
+  const fetchNearbyAgents = useCallback(async (
+    latitude: number,
+    longitude: number,
+    radius: number,
+  ) => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `/api/agents/nearby?latitude=${latitude}&longitude=${longitude}&radius=${radius}`,
+      );
+      console.log("Response: ", response);
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch nearby agents");
+      }
+
+      const data = await response.json();
+      
+      setAgents(data.agents || []);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching agents:", error);
+      setError("Failed to load nearby agents. Please try again later.");
+      setLoading(false);
+    }
+  }, []);
 
   // Request user's geolocation
   useEffect(() => {
@@ -53,6 +80,7 @@ const MapClient: React.FC = () => {
         (position) => {
           const { latitude, longitude } = position.coords;
           setUserLocation([latitude, longitude]);
+          setIsLocationLoaded(true);
           fetchNearbyAgents(latitude, longitude, radius);
         },
         (error) => {
@@ -67,38 +95,21 @@ const MapClient: React.FC = () => {
       setError("Geolocation is not supported by your browser.");
       setLoading(false);
     }
-  }, [radius]);
+  }, []); // Remove radius dependency to avoid re-fetching location
 
-  // Fetch nearby agents
-  const fetchNearbyAgents = async (
-    latitude: number,
-    longitude: number,
-    radius: number,
-  ) => {
-    try {
-      setLoading(true);
-      const response = await fetch(
-        `/api/agents/nearby?latitude=${latitude}&longitude=${longitude}&radius=${radius}`,
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch nearby agents");
-      }
-
-      const data = await response.json();
-      setAgents(data.agents || []);
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching agents:", error);
-      setError("Failed to load nearby agents. Please try again later.");
-      setLoading(false);
+  // Fetch agents when radius changes (but only if location is already loaded)
+  useEffect(() => {
+    if (isLocationLoaded && userLocation) {
+      fetchNearbyAgents(userLocation[0], userLocation[1], radius);
     }
-  };
+  }, [radius, isLocationLoaded, userLocation, fetchNearbyAgents]);
 
   // Handle radius change
   const handleRadiusChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newRadius = parseInt(e.target.value);
-    setRadius(newRadius);
+    if (newRadius >= 1 && newRadius <= 50) {
+      setRadius(newRadius);
+    }
   };
 
   // Handle callback request
@@ -174,7 +185,7 @@ const MapClient: React.FC = () => {
         </div>
 
         <div className="p-4">
-          {userLocation ? (
+          {userLocation && isLocationLoaded ? (
             <AgentMap
               agents={agents}
               userLocation={userLocation}
@@ -182,9 +193,9 @@ const MapClient: React.FC = () => {
               onViewRatings={handleViewRatings}
             />
           ) : (
-            <div className="w-full h-[400px] bg-alliance-gray-100 rounded-lg flex items-center justify-center">
+            <div className="w-full h-[600px] bg-alliance-gray-100 rounded-lg flex items-center justify-center">
               <div className="text-alliance-gray-500">
-                {loading ? "Loading map..." : "Unable to load map"}
+                {loading ? "Getting your location..." : "Unable to load map"}
               </div>
             </div>
           )}

@@ -1,6 +1,5 @@
-import { Agent } from '@/models/agent';
-import { User } from '@/models/user';
 import { Op } from 'sequelize';
+import { User, Agent } from '@/models/index';
 
 interface Coordinates {
   latitude: number;
@@ -74,7 +73,6 @@ export async function findNearbyAgents(
     return nearbyAgents;
   } catch (error) {
     console.error('Error finding nearby agents:', error);
-    throw new Error('Failed to find nearby agents');
   }
 }
 

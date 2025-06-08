@@ -26,12 +26,25 @@ export async function middleware(request: NextRequest) {
     "/callback",
   ];
 
+  // Public API routes that don't require authentication
+  const publicApiRoutes = [
+    "/api/public/",
+    "/api/agents/nearby", // Make nearby agents API public
+    "/api/auth/",
+    "/api/users/search", 
+    "/api/ratings"
+  ];
+
   // Check if the path starts with any of the public routes
   const isPublicRoute = publicRoutes.some(
     (route) =>
       pathname === route ||
-      pathname.startsWith(`${route}/`) ||
-      pathname.startsWith("/api/public/"),
+      pathname.startsWith(`${route}/`)
+  );
+
+  // Check if the path starts with any of the public API routes
+  const isPublicApiRoute = publicApiRoutes.some(
+    (route) => pathname.startsWith(route)
   );
 
   // Allow access to public assets
@@ -44,8 +57,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Allow public routes
-  if (isPublicRoute) {
+  // Allow public routes and public API routes
+  if (isPublicRoute || isPublicApiRoute) {
     // If already logged in, redirect from login/register pages
     if (token && (pathname === "/login" || pathname.startsWith("/register"))) {
       // Redirect to appropriate dashboard based on role

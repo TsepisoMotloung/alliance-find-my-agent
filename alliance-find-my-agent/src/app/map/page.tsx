@@ -1,6 +1,6 @@
-import React from "react";
-import MainLayout from "@/components/layouts/MainLayout";
-import MapClient from "./MapClient";
+import React from 'react';
+import MainLayout from '@/components/layouts/MainLayout';
+import MapClient from './MapClient';
 
 export default function MapPage() {
   return (
@@ -15,7 +15,7 @@ export default function MapPage() {
               Locate insurance agents near you and connect with them instantly
             </p>
           </div>
-
+          
           <MapClient />
         </div>
       </div>
