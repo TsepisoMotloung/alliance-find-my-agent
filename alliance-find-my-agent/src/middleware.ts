@@ -32,7 +32,8 @@ export async function middleware(request: NextRequest) {
     "/api/agents/nearby", // Make nearby agents API public
     "/api/auth/",
     "/api/users/search", 
-    "/api/ratings"
+    "/api/ratings",
+    "/api/callbacks",
   ];
 
   // Check if the path starts with any of the public routes

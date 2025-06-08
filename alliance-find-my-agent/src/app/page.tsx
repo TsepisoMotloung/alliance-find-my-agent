@@ -2,6 +2,9 @@ import React from "react";
 import Link from "next/link";
 import MainLayout from "@/components/layouts/MainLayout";
 import Button from "@/components/ui/Button";
+import { motion } from 'framer-motion';
+import { MapPin } from 'lucide-react';
+import AgentMapPlaceholder from "@/components/ui/AgentMapPlaceholder";
 
 export default function Home() {
   return (
@@ -27,16 +30,19 @@ export default function Home() {
                 </Button>
               </div>
             </div>
-            <div className="mt-12 md:mt-0 md:w-1/2">
+            {/* <div className="mt-12 md:mt-0 md:w-1/2"> */}
               {/* Placeholder for hero image */}
-              <div className="aspect-w-16 aspect-h-9 bg-alliance-gray-100 rounded-lg overflow-hidden shadow-lg">
+              {/* <div className="aspect-w-16 aspect-h-9 bg-alliance-gray-100 rounded-lg overflow-hidden shadow-lg">
                 <div className="w-full h-full flex items-center justify-center">
                   <span className="text-alliance-gray-400">
-                    [Agent Map Placeholder]
+                    
                   </span>
                 </div>
               </div>
-            </div>
+            </div> */}
+
+            
+            
           </div>
         </div>
       </div>

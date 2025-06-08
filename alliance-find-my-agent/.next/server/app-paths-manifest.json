@@ -1,11 +1,9 @@
 {
-  "/api/agents/nearby/route": "app/api/agents/nearby/route.js",
   "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
-  "/map/page": "app/map/page.js",
-  "/rate/search/page": "app/rate/search/page.js",
-  "/rate/agent/[id]/page": "app/rate/agent/[id]/page.js",
-  "/_not-found/page": "app/_not-found/page.js",
+  "/agent/location/page": "app/agent/location/page.js",
+  "/agent/qrcode/page": "app/agent/qrcode/page.js",
   "/page": "app/page.js",
-  "/agent/ratings/page": "app/agent/ratings/page.js",
+  "/admin/page": "app/admin/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
   "/(auth)/login/page": "app/(auth)/login/page.js"
 }

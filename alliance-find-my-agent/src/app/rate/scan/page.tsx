@@ -9,10 +9,10 @@ export default function ScanPage() {
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
             <h1 className="text-3xl font-bold text-alliance-gray-900 sm:text-4xl">
-              Scan Agent QR Code
+              Scan Agent/Employee QR Code
             </h1>
             <p className="mt-3 text-xl text-alliance-gray-500">
-              Scan an agent's QR code to rate their service or request a
+              Scan an employtee/agent's QR code to rate their service or request a
               callback
             </p>
           </div>

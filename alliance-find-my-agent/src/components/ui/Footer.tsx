@@ -11,9 +11,13 @@ const Footer: React.FC = () => {
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center">
               {/* Logo placeholder */}
-              <div className="h-8 w-8 bg-alliance-red-600 rounded-md flex items-center justify-center">
-                <span className="text-white font-bold">A</span>
-              </div>
+              <div className="h-8 w-8 rounded-md flex items-center justify-center overflow-hidden">
+                  <img 
+                    src="/images/Mappattern.jpg" 
+                    alt="Logo" 
+                    className="h-full w-full object-cover"
+                  />
+                </div>
               <span className="ml-2 text-xl font-semibold text-alliance-gray-900">
                 Alliance Insurance
               </span>

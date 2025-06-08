@@ -201,6 +201,7 @@ const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({
                   value="card"
                   checked={downloadType === "card"}
                   onChange={() => setDownloadType("card")}
+                  disabled={true}
                   className="h-4 w-4 text-alliance-red-600 border-alliance-gray-300 focus:ring-alliance-red-500"
                 />
                 <span className="ml-2 text-sm text-alliance-gray-700">

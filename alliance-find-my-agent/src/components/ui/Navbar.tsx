@@ -21,6 +21,7 @@ const Navbar: React.FC = () => {
       return [
         { href: "/", label: "Home" },
         { href: "/map", label: "Find Agent" },
+        { href: "/rate/scan", label: "Scan QR Code" },
       ];
     }
 
@@ -59,6 +60,7 @@ const Navbar: React.FC = () => {
     return [
       { href: "/", label: "Home" },
       { href: "/map", label: "Find Agent" },
+      { href: "/rate/scan", label: "Scan QR Code" },
     ];
   };
 
@@ -72,10 +74,14 @@ const Navbar: React.FC = () => {
             <div className="flex-shrink-0 flex items-center">
               <Link href="/" className="flex items-center">
                 {/* Logo placeholder */}
-                <div className="h-8 w-8 bg-alliance-red-600 rounded-md flex items-center justify-center">
-                  <span className="text-white font-bold">A</span>
+                <div className="h-8 w-8 rounded-md flex items-center justify-center overflow-hidden">
+                  <img 
+                    src="/images/Mappattern.jpg" 
+                    alt="Logo" 
+                    className="h-full w-full object-cover"
+                  />
                 </div>
-                <span className="ml-2 text-xl font-semibold text-alliance-gray-900">
+                <span className="ml-2 text-xl font-semibold text-alliance-red-900">
                   Alliance Insurance
                 </span>
               </Link>
