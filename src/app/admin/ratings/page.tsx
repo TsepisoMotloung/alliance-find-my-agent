@@ -28,12 +28,13 @@ export default async function AdminRatingsPage({ searchParams }: Props) {
     redirect("/login");
   }
 
-  const page = parseInt(searchParams.page || "1");
+  const resolvedSearchParams = await searchParams;
+  const page = parseInt(resolvedSearchParams.page || "1");
   const limit = 20;
   const offset = (page - 1) * limit;
-  const search = searchParams.search || "";
-  const targetRoleFilter = searchParams.targetRole || "";
-  const scoreFilter = searchParams.score || "";
+  const search = resolvedSearchParams.search || "";
+  const targetRoleFilter = resolvedSearchParams.targetRole || "";
+  const scoreFilter = resolvedSearchParams.score || "";
 
   try {
     const whereClause: any = {};

@@ -27,12 +27,13 @@ export default async function AdminComplaintsPage({ searchParams }: Props) {
     redirect("/login");
   }
 
-  const page = parseInt(searchParams.page || "1");
+  const resolvedSearchParams = await searchParams;
+  const page = parseInt(resolvedSearchParams.page || "1");
   const limit = 20;
   const offset = (page - 1) * limit;
-  const search = searchParams.search || "";
-  const statusFilter = searchParams.status || "";
-  const targetRoleFilter = searchParams.targetRole || "";
+  const search = resolvedSearchParams.search || "";
+  const statusFilter = resolvedSearchParams.status || "";
+  const targetRoleFilter = resolvedSearchParams.targetRole || "";
 
   try {
     const whereClause: any = {};

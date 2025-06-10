@@ -1,4 +1,3 @@
-
 import React from "react";
 import Link from "next/link";
 import { getServerSession } from "next-auth/next";
@@ -26,16 +25,17 @@ export default async function AdminAgentsPage({ searchParams }: Props) {
     redirect("/login");
   }
 
-  const page = parseInt(searchParams.page || "1");
+  const resolvedSearchParams = await searchParams;
+  const page = parseInt(resolvedSearchParams.page || "1");
   const limit = 20;
   const offset = (page - 1) * limit;
-  const search = searchParams.search || "";
-  const availableFilter = searchParams.available || "";
+  const search = resolvedSearchParams.search || "";
+  const availableFilter = resolvedSearchParams.available || "";
 
   try {
     const whereClause: any = {};
     const userWhereClause: any = {};
-    
+
     if (search) {
       userWhereClause[Op.or] = [
         { firstName: { [Op.like]: `%${search}%` } },
@@ -43,7 +43,7 @@ export default async function AdminAgentsPage({ searchParams }: Props) {
         { email: { [Op.like]: `%${search}%` } }
       ];
     }
-    
+
     if (availableFilter) {
       whereClause.isAvailable = availableFilter === "true";
     }

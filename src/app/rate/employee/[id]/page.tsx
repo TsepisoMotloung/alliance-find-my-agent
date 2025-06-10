@@ -11,10 +11,9 @@ interface RateEmployeePageProps {
   };
 }
 
-export default async function RateEmployeePage({
-  params,
-}: RateEmployeePageProps) {
-  const { id } = params;
+export default async function RateEmployeePage({ params }: RateEmployeePageProps) {
+  const resolvedParams = await params;
+  const { id } = resolvedParams;
 
   try {
     // Fetch employee details

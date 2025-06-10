@@ -1,4 +1,3 @@
-
 import React from "react";
 import Link from "next/link";
 import { getServerSession } from "next-auth/next";
@@ -26,15 +25,17 @@ export default async function AdminCallbacksPage({ searchParams }: Props) {
     redirect("/login");
   }
 
-  const page = parseInt(searchParams.page || "1");
+  const resolvedSearchParams = await searchParams;
+  const page = parseInt(resolvedSearchParams.page || "1");
   const limit = 20;
   const offset = (page - 1) * limit;
-  const search = searchParams.search || "";
-  const statusFilter = searchParams.status || "";
+  const search = resolvedSearchParams.search || "";
+  const statusFilter = resolvedSearchParams.status || "";
+  const agentFilter = resolvedSearchParams.agent || "";
 
   try {
     const whereClause: any = {};
-    
+
     if (search) {
       whereClause[Op.or] = [
         { clientName: { [Op.like]: `%${search}%` } },
@@ -42,7 +43,7 @@ export default async function AdminCallbacksPage({ searchParams }: Props) {
         { clientPhone: { [Op.like]: `%${search}%` } }
       ];
     }
-    
+
     if (statusFilter) {
       whereClause.status = statusFilter;
     }

@@ -23,7 +23,8 @@ export default async function AdminQuestionsPage({ searchParams }: Props) {
     redirect("/login");
   }
 
-  const targetRoleFilter = searchParams.targetRole || "agent";
+  const resolvedSearchParams = await searchParams;
+  const targetRoleFilter = resolvedSearchParams.targetRole || "agent";
 
   try {
     const questions = await Question.findAll({

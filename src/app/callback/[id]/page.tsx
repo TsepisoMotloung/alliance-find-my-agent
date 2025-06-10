@@ -12,7 +12,8 @@ interface CallbackPageProps {
 }
 
 export default async function CallbackPage({ params }: CallbackPageProps) {
-  const { id } = params;
+  const resolvedParams = await params;
+  const { id } = resolvedParams;
 
   try {
     // Fetch agent details

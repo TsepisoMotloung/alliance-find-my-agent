@@ -26,11 +26,12 @@ export default async function AdminEmployeesPage({ searchParams }: Props) {
     redirect("/login");
   }
 
-  const page = parseInt(searchParams.page || "1");
+  const resolvedSearchParams = await searchParams;
+  const page = parseInt(resolvedSearchParams.page || "1");
   const limit = 20;
   const offset = (page - 1) * limit;
-  const search = searchParams.search || "";
-  const departmentFilter = searchParams.department || "";
+  const search = resolvedSearchParams.search || "";
+  const departmentFilter = resolvedSearchParams.department || "";
 
   try {
     const whereClause: any = {};

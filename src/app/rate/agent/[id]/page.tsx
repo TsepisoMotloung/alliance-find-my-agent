@@ -12,7 +12,8 @@ interface RateAgentPageProps {
 }
 
 export default async function RateAgentPage({ params }: RateAgentPageProps) {
-  const { id } = params;
+  const resolvedParams = await params;
+  const { id } = resolvedParams;
 
   try {
     // Fetch agent details
