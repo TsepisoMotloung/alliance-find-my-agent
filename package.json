@@ -14,6 +14,7 @@
     "@tailwindcss/postcss": "^4.1.8",
     "autoprefixer": "^10.4.16",
     "bcryptjs": "^2.4.3",
+    "dotenv": "^16.5.0",
     "framer-motion": "^12.16.0",
     "geolocation-utils": "^1.2.5",
     "html5-qrcode": "^2.3.8",

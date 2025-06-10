@@ -1,1 +1,9 @@
-{}
+{
+  "/api/users/search/route": "app/api/users/search/route.js",
+  "/admin/questions/page": "app/admin/questions/page.js",
+  "/map/page": "app/map/page.js",
+  "/rate/scan/page": "app/rate/scan/page.js",
+  "/rate/search/page": "app/rate/search/page.js",
+  "/rate/agent/[id]/page": "app/rate/agent/[id]/page.js",
+  "/(auth)/login/page": "app/(auth)/login/page.js"
+}
