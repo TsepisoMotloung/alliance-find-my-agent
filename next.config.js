@@ -14,6 +14,15 @@ const nextConfig = {
     // your project has TypeScript errors.
     ignoreBuildErrors: true,
   },
+  experimental: {
+    appDir: true,
+  },
+  allowedDevOrigins: [
+    '.replit.dev',
+    '.repl.co',
+    'localhost:3000',
+    '127.0.0.1:3000'
+  ],
 };
 
 module.exports = nextConfig;

@@ -2,9 +2,6 @@ import { Model, DataTypes, Optional } from "sequelize";
 import sequelize from "@/lib/db";
 import { IRating } from "@/types/models";
 import { v4 as uuidv4 } from "uuid";
-import User from "./user";
-import Agent from "./agent";
-import Employee from "./employee";
 
 // Interface for Rating creation attributes
 interface RatingCreationAttributes
@@ -63,6 +60,7 @@ class Rating
     );
 
     if (targetRole === "agent") {
+      const { Agent } = await import("./index");
       const agent = await Agent.findOne({
         where: { userId: targetId },
       });
@@ -71,6 +69,7 @@ class Rating
         await agent.save();
       }
     } else if (targetRole === "employee") {
+      const { Employee } = await import("./index");
       const employee = await Employee.findOne({
         where: { userId: targetId },
       });
@@ -170,16 +169,6 @@ Rating.init(
   },
 );
 
-// Define associations
-Rating.belongsTo(User, {
-  foreignKey: "targetId",
-  as: "target",
-  constraints: false,
-});
-Rating.belongsTo(User, {
-  foreignKey: "raterId",
-  as: "rater",
-  constraints: false,
-});
+// Associations will be defined in index.ts to avoid circular imports
 
 export default Rating;

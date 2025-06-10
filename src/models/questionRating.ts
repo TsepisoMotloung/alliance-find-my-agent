@@ -2,8 +2,6 @@
 import { Model, DataTypes, Optional } from "sequelize";
 import sequelize from "@/lib/db";
 import { v4 as uuidv4 } from "uuid";
-import Rating from "./rating";
-import Question from "./question";
 
 // Interface for QuestionRating
 interface IQuestionRating {
@@ -32,8 +30,7 @@ class QuestionRating
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 
-  // Associations
-  public question?: Question;
+  // Associations will be defined in index.ts to avoid circular imports
 }
 
 QuestionRating.init(
