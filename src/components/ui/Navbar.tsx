@@ -146,7 +146,7 @@ const Navbar: React.FC = () => {
                   Hello, {session.user.name}
                 </span>
                 <button
-                  onClick={() => signOut({ callbackUrl: "/login" })}
+                  onClick={() => signOut({ callbackUrl: "/login", redirect: true })}
                   className="inline-flex items-center px-3 py-1.5 border border-alliance-red-600 text-sm font-medium rounded-md text-alliance-red-600 bg-white hover:bg-alliance-red-50"
                 >
                   Sign Out
@@ -247,7 +247,7 @@ const Navbar: React.FC = () => {
                 </div>
               </div>
               <button
-                onClick={() => signOut({ callbackUrl: "/login" })}
+                onClick={() => signOut({ callbackUrl: "/login", redirect: true })}
                 className="ml-auto flex-shrink-0 bg-white p-1 rounded-full text-alliance-gray-400 hover:text-alliance-gray-500"
               >
                 <span className="sr-only">Sign out</span>
