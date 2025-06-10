@@ -1,4 +1,3 @@
-
 import User from "./user";
 import Agent from "./agent";
 import Employee from "./employee";
@@ -40,7 +39,7 @@ Agent.hasMany(Callback, { foreignKey: "agentId", as: "callbacks" });
 Employee.belongsTo(User, { foreignKey: "userId", as: "user" });
 
 // Export models and sequelize
-export { sequelize, User, Agent, Employee, Rating, Complaint, Callback };
+export { sequelize, User, Agent, Employee, Rating, Complaint, Callback, Question };
 
 export default {
   sequelize,
@@ -50,4 +49,5 @@ export default {
   Rating,
   Complaint,
   Callback,
+  Question,
 };

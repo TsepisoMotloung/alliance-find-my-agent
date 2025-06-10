@@ -1,10 +1,16 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import StarRating from '@/components/ui/StarRating';
+
+interface Question {
+  id: string;
+  question: string;
+  order: number;
+}
 
 interface RatingFormProps {
   targetId: string;
@@ -29,12 +35,40 @@ const RatingForm: React.FC<RatingFormProps> = ({
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [rating, setRating] = useState(0);
   const [submitted, setSubmitted] = useState(false);
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [questionAnswers, setQuestionAnswers] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(true);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<FormValues>();
+
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      try {
+        const response = await fetch(`/api/questions?targetRole=${targetRole}`);
+        if (response.ok) {
+          const data = await response.json();
+          setQuestions(data.questions || []);
+        }
+      } catch (error) {
+        console.error("Error fetching questions:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchQuestions();
+  }, [targetRole]);
+
+  const handleQuestionAnswer = (questionId: string, answer: string) => {
+    setQuestionAnswers(prev => ({
+      ...prev,
+      [questionId]: answer
+    }));
+  };
 
   const onSubmit = async (data: FormValues) => {
     // Validate rating
@@ -47,6 +81,20 @@ const RatingForm: React.FC<RatingFormProps> = ({
     setSubmitError(null);
 
     try {
+      // Combine general comment with question answers
+      const allComments = [];
+      if (data.comment.trim()) {
+        allComments.push(data.comment.trim());
+      }
+
+      // Add question answers to comments
+      questions.forEach(question => {
+        const answer = questionAnswers[question.id];
+        if (answer && answer.trim()) {
+          allComments.push(`${question.question}: ${answer.trim()}`);
+        }
+      });
+
       // Prepare rating data
       const ratingData = {
         targetId,
@@ -54,7 +102,7 @@ const RatingForm: React.FC<RatingFormProps> = ({
         raterName: data.raterName,
         raterEmail: data.raterEmail,
         score: rating,
-        comment: data.comment,
+        comment: allComments.length > 0 ? allComments.join('\n\n') : undefined,
       };
 
       // Submit rating
@@ -147,6 +195,31 @@ const RatingForm: React.FC<RatingFormProps> = ({
         })}
         error={errors.raterEmail?.message}
       />
+        {/* Dynamic Questions */}
+        {loading ? (
+          <div className="text-center py-4">
+            <p className="text-alliance-gray-500">Loading questions...</p>
+          </div>
+        ) : questions.length > 0 ? (
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium text-alliance-gray-900">
+              Please answer the following questions:
+            </h3>
+            {questions.map((question) => (
+              <div key={question.id}>
+                <label className="block mb-1 text-sm font-medium text-alliance-gray-700">
+                  {question.question}
+                </label>
+                <textarea
+                  className="w-full px-4 py-2 bg-white border border-alliance-gray-300 rounded-md text-alliance-gray-900 placeholder-alliance-gray-400 focus:outline-none focus:ring-2 focus:border-alliance-red-300 focus:ring-alliance-red-500 transition duration-150"
+                  rows={3}
+                  value={questionAnswers[question.id] || ""}
+                  onChange={(e) => handleQuestionAnswer(question.id, e.target.value)}
+                ></textarea>
+              </div>
+            ))}
+          </div>
+        ) : null}
 
       <div>
         <label className="block mb-1 text-sm font-medium text-alliance-gray-700">
