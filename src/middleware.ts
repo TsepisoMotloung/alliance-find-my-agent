@@ -31,21 +31,26 @@ export async function middleware(request: NextRequest) {
     "/api/public/",
     "/api/agents/nearby", // Make nearby agents API public
     "/api/auth/",
-    "/api/users/search", 
+    "/api/users/search",
     "/api/ratings",
     "/api/callbacks",
+    "/api/questions",
+    "/api/complaints",
+    "/api/locations",
+    "/api/locations/search",
+    "/api/locations/autocomplete",
+    "/api/locations/geocode",
+    "/api/locations/reverse-geocode",
   ];
 
   // Check if the path starts with any of the public routes
   const isPublicRoute = publicRoutes.some(
-    (route) =>
-      pathname === route ||
-      pathname.startsWith(`${route}/`)
+    (route) => pathname === route || pathname.startsWith(`${route}/`),
   );
 
   // Check if the path starts with any of the public API routes
-  const isPublicApiRoute = publicApiRoutes.some(
-    (route) => pathname.startsWith(route)
+  const isPublicApiRoute = publicApiRoutes.some((route) =>
+    pathname.startsWith(route),
   );
 
   // Allow access to public assets
