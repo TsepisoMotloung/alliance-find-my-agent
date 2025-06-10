@@ -123,8 +123,9 @@ export default async function AdminCallbacksPage({ searchParams }: Props) {
             </div>
 
             {/* Callbacks Table */}
-            <div className="mt-8 overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-              <table className="min-w-full divide-y divide-alliance-gray-300">
+            <div className="bg-white shadow overflow-hidden sm:rounded-md">
+            <div className="overflow-x-auto max-h-96 overflow-y-auto">
+              <table className="min-w-full divide-y divide-alliance-gray-200">
                 <thead className="bg-alliance-gray-50">
                   <tr>
                     <th className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-alliance-gray-900 sm:pl-6">
@@ -204,6 +205,7 @@ export default async function AdminCallbacksPage({ searchParams }: Props) {
                   ))}
                 </tbody>
               </table>
+            </div>
             </div>
 
             {/* Pagination */}

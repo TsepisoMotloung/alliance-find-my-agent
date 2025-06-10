@@ -4,7 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { Callback, Agent, User } from "@/models";
 import { UserRole } from "@/types/models";
 
-// Get a single callback request
+// Get specific callback
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } },
@@ -65,8 +65,170 @@ export async function GET(
   } catch (error) {
     console.error("Error fetching callback:", error);
     return NextResponse.json(
-      { message: "An error occurred while fetching callback request" },
-      { status: 500 },
+      { message: "An error occurred while fetching callback" },
+      { status: 500 }
+    );
+  }
+}
+
+// Update callback
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } },
+) {
+  try {
+    const resolvedParams = await params;
+    const { id } = resolvedParams;
+
+    // Check authentication
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+      return NextResponse.json(
+        { message: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    // Only admin and agents can update callbacks
+    if (![UserRole.ADMIN, UserRole.AGENT].includes(session.user.role as UserRole)) {
+      return NextResponse.json(
+        { message: 'Forbidden' },
+        { status: 403 }
+      );
+    }
+
+    const body = await request.json();
+    const {
+      clientName,
+      clientEmail,
+      clientPhone,
+      purpose,
+      status,
+      notes,
+      scheduledAt,
+    } = body;
+
+    // Find the callback
+    const callback = await Callback.findByPk(id);
+
+    if (!callback) {
+      return NextResponse.json(
+        { message: 'Callback not found' },
+        { status: 404 }
+      );
+    }
+
+    // If user is an agent, they can only update their own callbacks
+    if (session.user.role === UserRole.AGENT) {
+      const agent = await Agent.findOne({
+        where: { userId: session.user.id },
+      });
+
+      if (!agent || callback.agentId !== agent.id) {
+        return NextResponse.json(
+          { message: 'Forbidden' },
+          { status: 403 }
+        );
+      }
+    }
+
+    // Update callback
+    const updateData: any = {
+      clientName,
+      clientEmail,
+      clientPhone,
+      purpose,
+      status,
+      notes,
+    };
+
+    // Handle status-specific updates
+    if (status === 'scheduled' && scheduledAt) {
+      updateData.scheduledAt = new Date(scheduledAt);
+    } else if (status === 'completed') {
+      updateData.completedAt = new Date();
+    }
+
+    await callback.update(updateData);
+
+    // Return updated callback with relations
+    const updatedCallback = await Callback.findByPk(id, {
+      include: [
+        {
+          model: Agent,
+          as: 'agent',
+          include: [
+            {
+              model: User,
+              as: 'user',
+              attributes: ['id', 'firstName', 'lastName', 'email', 'phone'],
+            },
+          ],
+        },
+      ],
+    });
+
+    return NextResponse.json({
+      message: 'Callback updated successfully',
+      callback: updatedCallback,
+    });
+  } catch (error) {
+    console.error('Error updating callback:', error);
+    return NextResponse.json(
+      { message: 'An error occurred while updating callback' },
+      { status: 500 }
+    );
+  }
+}
+
+// Delete callback
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } },
+) {
+  try {
+    const resolvedParams = await params;
+    const { id } = resolvedParams;
+
+    // Check authentication
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+      return NextResponse.json(
+        { message: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    // Only admin can delete callbacks
+    if (session.user.role !== UserRole.ADMIN) {
+      return NextResponse.json(
+        { message: 'Forbidden' },
+        { status: 403 }
+      );
+    }
+
+    // Find and delete the callback
+    const callback = await Callback.findByPk(id);
+
+    if (!callback) {
+      return NextResponse.json(
+        { message: 'Callback not found' },
+        { status: 404 }
+      );
+    }
+
+    await callback.destroy();
+
+    return NextResponse.json({
+      message: 'Callback deleted successfully',
+    });
+  } catch (error) {
+    console.error('Error deleting callback:', error);
+    return NextResponse.json(
+      { message: 'An error occurred while deleting callback' },
+      { status: 500 }
     );
   }
 }
