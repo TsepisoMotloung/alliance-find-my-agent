@@ -1,10 +1,10 @@
 {
-  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
-  "/page": "app/page.js",
+  "/api/users/search/route": "app/api/users/search/route.js",
+  "/api/questions/route": "app/api/questions/route.js",
+  "/admin/ratings/page": "app/admin/ratings/page.js",
+  "/admin/ratings/[id]/page": "app/admin/ratings/[id]/page.js",
   "/rate/scan/page": "app/rate/scan/page.js",
   "/rate/search/page": "app/rate/search/page.js",
   "/rate/agent/[id]/page": "app/rate/agent/[id]/page.js",
-  "/admin/ratings/page": "app/admin/ratings/page.js",
-  "/_not-found/page": "app/_not-found/page.js",
   "/(auth)/login/page": "app/(auth)/login/page.js"
 }
