@@ -5,6 +5,7 @@ import Rating from "./rating";
 import Complaint from "./complaint";
 import Callback from "./callback";
 import sequelize from "@/lib/db";
+import Question from "./question"; // Added import for Question model
 
 // Define associations
 User.hasOne(Agent, { foreignKey: "userId", as: "agent" });
