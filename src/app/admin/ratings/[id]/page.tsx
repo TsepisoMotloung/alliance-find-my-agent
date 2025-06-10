@@ -5,7 +5,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { redirect, notFound } from "next/navigation";
 import MainLayout from "@/components/layouts/MainLayout";
-import { Rating, User, Question, QuestionRating } from "@/models";
+import { Rating, User, QuestionRating, Question } from "@/models";
 import { UserRole } from "@/types/models";
 import StarRating from "@/components/ui/StarRating";
 import Button from "@/components/ui/Button";
@@ -21,10 +21,10 @@ export default async function RatingDetailsPage({ params }: Props) {
     redirect("/login");
   }
 
-  const resolvedParams = await params;
+  const { id } = await params;
 
   try {
-    const rating = await Rating.findByPk(resolvedParams.id, {
+    const rating = await Rating.findByPk(id, {
       include: [
         {
           model: User,
@@ -44,7 +44,7 @@ export default async function RatingDetailsPage({ params }: Props) {
             {
               model: Question,
               as: "question",
-              attributes: ["question", "order"]
+              attributes: ["id", "question", "order"]
             }
           ]
         }
@@ -54,6 +54,11 @@ export default async function RatingDetailsPage({ params }: Props) {
     if (!rating) {
       notFound();
     }
+
+    const questionRatings = rating.questionRatings || [];
+    const sortedQuestionRatings = questionRatings.sort((a, b) => 
+      (a.question?.order || 0) - (b.question?.order || 0)
+    );
 
     return (
       <MainLayout>
@@ -69,33 +74,41 @@ export default async function RatingDetailsPage({ params }: Props) {
                     Detailed view of the rating and feedback
                   </p>
                 </div>
-                <Button href="/admin/ratings" variant="secondary">
-                  Back to Ratings
-                </Button>
+                <div className="flex space-x-3">
+                  <Button href="/admin/ratings" variant="secondary">
+                    Back to Ratings
+                  </Button>
+                  <Button href={`/admin/ratings/${rating.id}/edit`} variant="primary">
+                    Edit Rating
+                  </Button>
+                  <Button href={`/admin/ratings/${rating.id}/delete`} variant="danger">
+                    Delete Rating
+                  </Button>
+                </div>
               </div>
             </div>
 
-            <div className="bg-white shadow rounded-lg overflow-hidden">
-              {/* Rating Overview */}
-              <div className="px-6 py-5 border-b border-alliance-gray-200">
-                <h3 className="text-lg leading-6 font-medium text-alliance-gray-900">
-                  Rating Overview
-                </h3>
-                <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Rating Overview */}
+            <div className="bg-white shadow rounded-lg mb-8">
+              <div className="px-6 py-4 border-b border-alliance-gray-200">
+                <h2 className="text-lg font-medium text-alliance-gray-900">Rating Overview</h2>
+              </div>
+              <div className="px-6 py-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <dt className="text-sm font-medium text-alliance-gray-500">Target</dt>
-                    <dd className="mt-1 text-sm text-alliance-gray-900">
+                    <h3 className="text-sm font-medium text-alliance-gray-500 mb-2">Target</h3>
+                    <div className="text-sm text-alliance-gray-900">
                       <div className="font-medium">
                         {rating.target?.firstName} {rating.target?.lastName}
                       </div>
                       <div className="text-alliance-gray-500">
                         {rating.targetRole} • {rating.target?.email}
                       </div>
-                    </dd>
+                    </div>
                   </div>
                   <div>
-                    <dt className="text-sm font-medium text-alliance-gray-500">Rated By</dt>
-                    <dd className="mt-1 text-sm text-alliance-gray-900">
+                    <h3 className="text-sm font-medium text-alliance-gray-500 mb-2">Rated By</h3>
+                    <div className="text-sm text-alliance-gray-900">
                       <div className="font-medium">
                         {rating.rater 
                           ? `${rating.rater.firstName} ${rating.rater.lastName}`
@@ -103,61 +116,61 @@ export default async function RatingDetailsPage({ params }: Props) {
                         }
                       </div>
                       <div className="text-alliance-gray-500">
-                        {rating.rater?.email || rating.raterEmail || "No email"}
+                        {rating.rater?.email || rating.raterEmail || "No email provided"}
                       </div>
-                    </dd>
+                    </div>
                   </div>
                   <div>
-                    <dt className="text-sm font-medium text-alliance-gray-500">Overall Rating</dt>
-                    <dd className="mt-1 flex items-center">
+                    <h3 className="text-sm font-medium text-alliance-gray-500 mb-2">Overall Rating</h3>
+                    <div className="flex items-center">
                       <StarRating value={rating.score} readonly size="md" />
                       <span className="ml-2 text-lg font-medium text-alliance-gray-900">
                         {rating.score}/5
                       </span>
-                    </dd>
+                    </div>
                   </div>
                   <div>
-                    <dt className="text-sm font-medium text-alliance-gray-500">Date</dt>
-                    <dd className="mt-1 text-sm text-alliance-gray-900">
-                      {new Date(rating.createdAt).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </dd>
+                    <h3 className="text-sm font-medium text-alliance-gray-500 mb-2">Date</h3>
+                    <div className="text-sm text-alliance-gray-900">
+                      <div>{new Date(rating.createdAt).toLocaleDateString()}</div>
+                      <div className="text-alliance-gray-500">
+                        {new Date(rating.createdAt).toLocaleTimeString()}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
+            </div>
 
-              {/* Question Ratings */}
-              {rating.questionRatings && rating.questionRatings.length > 0 && (
-                <div className="px-6 py-5 border-b border-alliance-gray-200">
-                  <h3 className="text-lg leading-6 font-medium text-alliance-gray-900 mb-4">
-                    Question Ratings
-                  </h3>
+            {/* Question Ratings */}
+            {sortedQuestionRatings.length > 0 && (
+              <div className="bg-white shadow rounded-lg mb-8">
+                <div className="px-6 py-4 border-b border-alliance-gray-200">
+                  <h2 className="text-lg font-medium text-alliance-gray-900">Question-Specific Ratings</h2>
+                </div>
+                <div className="px-6 py-4">
                   <div className="space-y-4">
-                    {rating.questionRatings
-                      .sort((a: any, b: any) => (a.question?.order || 0) - (b.question?.order || 0))
-                      .map((qr: any) => (
-                      <div key={qr.id} className="bg-alliance-gray-50 rounded-lg p-4">
-                        <div className="flex justify-between items-start">
+                    {sortedQuestionRatings.map((qr) => (
+                      <div key={qr.id} className="border border-alliance-gray-200 rounded-lg p-4">
+                        <div className="flex items-start justify-between">
                           <div className="flex-1">
-                            <p className="text-sm font-medium text-alliance-gray-900 mb-2">
-                              {qr.question?.question || "Question not found"}
-                            </p>
+                            <h4 className="text-sm font-medium text-alliance-gray-900 mb-2">
+                              {qr.question?.question}
+                            </h4>
+                          </div>
+                          <div className="ml-4 text-right">
                             <div className="flex items-center">
                               <StarRating value={qr.score} readonly size="sm" />
-                              <span className="ml-2 text-sm font-medium text-alliance-gray-700">
+                              <span className="ml-2 text-sm font-medium text-alliance-gray-900">
                                 {qr.score}/5
                               </span>
-                              <span className="ml-2 text-xs text-alliance-gray-500">
-                                ({qr.score === 1 ? 'Poor' : 
-                                  qr.score === 2 ? 'Fair' : 
-                                  qr.score === 3 ? 'Good' : 
-                                  qr.score === 4 ? 'Very Good' : 'Excellent'})
-                              </span>
+                            </div>
+                            <div className="text-xs text-alliance-gray-500 mt-1">
+                              {qr.score === 1 && 'Poor'}
+                              {qr.score === 2 && 'Fair'}
+                              {qr.score === 3 && 'Good'}
+                              {qr.score === 4 && 'Very Good'}
+                              {qr.score === 5 && 'Excellent'}
                             </div>
                           </div>
                         </div>
@@ -165,29 +178,44 @@ export default async function RatingDetailsPage({ params }: Props) {
                     ))}
                   </div>
                 </div>
-              )}
+              </div>
+            )}
 
-              {/* Comments */}
-              {rating.comment && (
-                <div className="px-6 py-5">
-                  <h3 className="text-lg leading-6 font-medium text-alliance-gray-900 mb-4">
-                    Comments
-                  </h3>
-                  <div className="bg-alliance-gray-50 rounded-lg p-4">
-                    <p className="text-sm text-alliance-gray-900 whitespace-pre-wrap">
-                      {rating.comment}
+            {/* Comments and Feedback */}
+            <div className="bg-white shadow rounded-lg">
+              <div className="px-6 py-4 border-b border-alliance-gray-200">
+                <h2 className="text-lg font-medium text-alliance-gray-900">Comments and Feedback</h2>
+              </div>
+              <div className="px-6 py-4">
+                {rating.comment ? (
+                  <div className="prose prose-sm max-w-none">
+                    {rating.comment.split('\n\n').map((section, index) => (
+                      <div key={index} className="mb-4 p-4 bg-alliance-gray-50 rounded-lg">
+                        {section.includes(':') ? (
+                          <div>
+                            <h4 className="font-medium text-alliance-gray-900 mb-2">
+                              {section.split(':')[0]}:
+                            </h4>
+                            <p className="text-alliance-gray-700 whitespace-pre-wrap">
+                              {section.split(':').slice(1).join(':').trim()}
+                            </p>
+                          </div>
+                        ) : (
+                          <p className="text-alliance-gray-700 whitespace-pre-wrap">
+                            {section}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-alliance-gray-500 italic">
+                      No additional comments provided
                     </p>
                   </div>
-                </div>
-              )}
-
-              {!rating.comment && (!rating.questionRatings || rating.questionRatings.length === 0) && (
-                <div className="px-6 py-5">
-                  <p className="text-alliance-gray-500 italic text-center">
-                    No additional feedback provided.
-                  </p>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
         </div>

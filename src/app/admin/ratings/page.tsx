@@ -151,91 +151,113 @@ export default async function AdminRatingsPage({ searchParams }: Props) {
 
             {/* Ratings Table */}
             <div className="mt-8 overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-              <table className="min-w-full divide-y divide-alliance-gray-300">
-                <thead className="bg-alliance-gray-50">
-                  <tr>
-                    <th className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-alliance-gray-900 sm:pl-6">
-                      Target
-                    </th>
-                    <th className="px-3 py-3.5 text-left text-sm font-semibold text-alliance-gray-900">
-                      Rated By
-                    </th>
-                    <th className="px-3 py-3.5 text-left text-sm font-semibold text-alliance-gray-900">
-                      Rating
-                    </th>
-                    <th className="px-3 py-3.5 text-left text-sm font-semibold text-alliance-gray-900">
-                      Comment
-                    </th>
-                    <th className="px-3 py-3.5 text-left text-sm font-semibold text-alliance-gray-900">
-                      Date
-                    </th>
-                    <th className="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                      <span className="sr-only">Actions</span>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-alliance-gray-200 bg-white">
-                  {ratings.map((rating) => (
-                    <tr key={rating.id}>
-                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-alliance-gray-900 sm:pl-6">
-                        <div>
-                          <div className="font-medium">
-                            {rating.target?.firstName} {rating.target?.lastName}
+              <div className="overflow-x-auto max-h-96 overflow-y-auto">
+                <table className="min-w-full divide-y divide-alliance-gray-300">
+                  <thead className="bg-alliance-gray-50 sticky top-0">
+                    <tr>
+                      <th className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-alliance-gray-900 sm:pl-6">
+                        Target
+                      </th>
+                      <th className="px-3 py-3.5 text-left text-sm font-semibold text-alliance-gray-900">
+                        Rated By
+                      </th>
+                      <th className="px-3 py-3.5 text-left text-sm font-semibold text-alliance-gray-900">
+                        Rating
+                      </th>
+                      <th className="px-3 py-3.5 text-left text-sm font-semibold text-alliance-gray-900 min-w-96">
+                        Comment/Feedback
+                      </th>
+                      <th className="px-3 py-3.5 text-left text-sm font-semibold text-alliance-gray-900">
+                        Date
+                      </th>
+                      <th className="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                        <span className="sr-only">Actions</span>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-alliance-gray-200 bg-white">
+                    {ratings.map((rating) => (
+                      <tr key={rating.id}>
+                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-alliance-gray-900 sm:pl-6">
+                          <div>
+                            <div className="font-medium">
+                              {rating.target?.firstName} {rating.target?.lastName}
+                            </div>
+                            <div className="text-alliance-gray-500 text-xs">
+                              {rating.targetRole} • {rating.target?.email}
+                            </div>
                           </div>
-                          <div className="text-alliance-gray-500">
-                            {rating.targetRole} • {rating.target?.email}
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-alliance-gray-500">
+                          <div>
+                            <div className="font-medium">
+                              {rating.rater 
+                                ? `${rating.rater.firstName} ${rating.rater.lastName}`
+                                : rating.raterName || "Anonymous"
+                              }
+                            </div>
+                            <div className="text-alliance-gray-500 text-xs">
+                              {rating.rater?.email || rating.raterEmail || "No email"}
+                            </div>
                           </div>
-                        </div>
-                      </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-alliance-gray-500">
-                        <div>
-                          <div className="font-medium">
-                            {rating.rater 
-                              ? `${rating.rater.firstName} ${rating.rater.lastName}`
-                              : rating.raterName || "Anonymous"
-                            }
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-alliance-gray-500">
+                          <div className="flex items-center">
+                            <StarRating value={rating.score} readonly size="sm" />
+                            <span className="ml-2 text-sm font-medium">
+                              {rating.score}/5
+                            </span>
                           </div>
-                          <div className="text-alliance-gray-500">
-                            {rating.rater?.email || rating.raterEmail || "No email"}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-alliance-gray-500">
-                        <div className="flex items-center">
-                          <StarRating value={rating.score} readonly size="sm" />
-                          <span className="ml-2 text-sm font-medium">
-                            {rating.score}/5
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-3 py-4 text-sm text-alliance-gray-500">
-                        <div className="max-w-xs">
+                        </td>
+                        <td className="px-3 py-4 text-sm text-alliance-gray-500 max-w-96">
                           {rating.comment ? (
-                            <div className="truncate" title={rating.comment}>
-                              {rating.comment}
+                            <div className="whitespace-pre-wrap break-words">
+                              {rating.comment.split('\n\n').map((section, index) => (
+                                <div key={index} className="mb-2">
+                                  {section.includes(':') ? (
+                                    <div>
+                                      <span className="font-medium text-alliance-gray-700">
+                                        {section.split(':')[0]}:
+                                      </span>
+                                      <span className="ml-1">
+                                        {section.split(':').slice(1).join(':')}
+                                      </span>
+                                    </div>
+                                  ) : (
+                                    <div>{section}</div>
+                                  )}
+                                </div>
+                              ))}
                             </div>
                           ) : (
                             <span className="text-alliance-gray-400 italic">
                               No comment
                             </span>
                           )}
-                        </div>
-                      </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-alliance-gray-500">
-                        {new Date(rating.createdAt).toLocaleDateString()}
-                      </td>
-                      <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                        <Link
-                          href={`/admin/ratings/${rating.id}`}
-                          className="text-alliance-red-600 hover:text-alliance-red-900"
-                        >
-                          View Details
-                        </Link>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-alliance-gray-500">
+                          <div>
+                            <div>{new Date(rating.createdAt).toLocaleDateString()}</div>
+                            <div className="text-xs text-alliance-gray-400">
+                              {new Date(rating.createdAt).toLocaleTimeString()}
+                            </div>
+                          </div>
+                        </td>
+                        <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                          <div className="flex flex-col space-y-1">
+                            <Link
+                              href={`/admin/ratings/${rating.id}`}
+                              className="text-alliance-red-600 hover:text-alliance-red-900"
+                            >
+                              View Details
+                            </Link>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
 
             {/* Pagination */}

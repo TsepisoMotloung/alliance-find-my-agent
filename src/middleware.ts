@@ -35,7 +35,7 @@ export async function middleware(request: NextRequest) {
     "/api/ratings",
     "/api/callbacks",
     "/api/questions",
-    "/api/complaints",
+    "/api/complaints",",
     "/api/locations",
     "/api/locations/search",
     "/api/locations/autocomplete",

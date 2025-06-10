@@ -150,6 +150,7 @@ export default async function AdminComplaintsPage({ searchParams }: Props) {
 
             {/* Complaints Table */}
             <div className="mt-8 overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+              <div className="overflow-x-auto max-h-96 overflow-y-auto">
               <table className="min-w-full divide-y divide-alliance-gray-300">
                 <thead className="bg-alliance-gray-50">
                   <tr>
@@ -239,6 +240,7 @@ export default async function AdminComplaintsPage({ searchParams }: Props) {
                   ))}
                 </tbody>
               </table>
+              </div>
             </div>
 
             {/* Pagination */}
