@@ -31,19 +31,33 @@ const LoginForm: React.FC = () => {
 
     try {
       const result = await signIn("credentials", {
-        redirect: false,
         email: data.email,
         password: data.password,
+        redirect: false,
       });
 
-      if (result?.error) {
-        console.log(result.error);
-        return;
+      if (result?.ok) {
+        // Get the user session to determine redirect
+        const response = await fetch("/api/auth/session");
+        const session = await response.json();
+
+        if (session?.user) {
+          const role = session.user.role;
+          if (role === "admin") {
+            window.location.href = "/admin";
+          } else if (role === "agent") {
+            window.location.href = "/agent";
+          } else if (role === "employee") {
+            window.location.href = "/employee";
+          } else {
+            window.location.href = "/";
+          }
+        } else {
+          window.location.href = "/";
+        }
+      } else {
+        setError(result?.error || "Invalid credentials");
       }
-      console.log("Submitting login form");
-      // Redirect based on user role (will be handled by middleware)
-      router.push(callbackUrl);
-      router.refresh();
     } catch (error) {
       console.log("An unexpected error occurred");
     } finally {

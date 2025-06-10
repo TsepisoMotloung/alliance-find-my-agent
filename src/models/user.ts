@@ -118,6 +118,30 @@ User.init(
           user.password = await User.hashPassword(user.password);
         }
       },
+      beforeDestroy: async (user: User) => {
+        // Import models dynamically to avoid circular dependencies
+        const { Agent, Employee, Rating, Complaint, Callback } = require('./index');
+        
+        // Delete related agent profile
+        await Agent.destroy({ where: { userId: user.id } });
+        
+        // Delete related employee profile
+        await Employee.destroy({ where: { userId: user.id } });
+        
+        // Delete ratings where user is target or rater
+        await Rating.destroy({ where: { targetId: user.id } });
+        await Rating.destroy({ where: { raterId: user.id } });
+        
+        // Delete complaints where user is target or complainant
+        await Complaint.destroy({ where: { targetId: user.id } });
+        await Complaint.destroy({ where: { complainantId: user.id } });
+        
+        // Delete callbacks for agents
+        const agent = await Agent.findOne({ where: { userId: user.id } });
+        if (agent) {
+          await Callback.destroy({ where: { agentId: agent.id } });
+        }
+      },
     },
   },
 );

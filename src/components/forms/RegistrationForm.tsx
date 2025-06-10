@@ -82,7 +82,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({ userType }) => {
         throw new Error(result.message || "Registration failed");
       }
 
-      // Redirect to the pending approval page
+      // Registration successful - redirect to approval page
       router.push("/approval");
     } catch (error) {
       setSubmitError(

@@ -202,6 +202,25 @@ export default async function AdminUsersPage({ searchParams }: Props) {
                         {new Date(user.createdAt).toLocaleDateString()}
                       </td>
                       <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                        {user.approvalStatus === ApprovalStatus.PENDING && (
+                          <form method="POST" action={`/api/users/${user.id}`} className="inline mr-2">
+                            <input type="hidden" name="approvalStatus" value={ApprovalStatus.APPROVED} />
+                            <button
+                              type="submit"
+                              className="text-green-600 hover:text-green-900 mr-2"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                fetch(`/api/users/${user.id}`, {
+                                  method: 'PATCH',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({ approvalStatus: ApprovalStatus.APPROVED })
+                                }).then(() => window.location.reload());
+                              }}
+                            >
+                              Approve
+                            </button>
+                          </form>
+                        )}
                         <Link
                           href={`/admin/users/${user.id}`}
                           className="text-alliance-red-600 hover:text-alliance-red-900 mr-4"

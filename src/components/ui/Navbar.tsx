@@ -12,7 +12,39 @@ const Navbar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const isActive = (path: string) => {
+    if (path === "/") {
+      return pathname === path;
+    }
     return pathname === path || pathname.startsWith(`${path}/`);
+  };
+
+  const getBreadcrumb = () => {
+    if (!session) return null;
+    
+    const segments = pathname.split('/').filter(Boolean);
+    if (segments.length === 0) return null;
+    
+    const role = session.user.role;
+    let breadcrumb = '';
+    
+    if (segments[0] === 'admin' && role === 'admin') {
+      breadcrumb = 'Admin';
+      if (segments[1]) {
+        breadcrumb += ` / ${segments[1].charAt(0).toUpperCase() + segments[1].slice(1)}`;
+      }
+    } else if (segments[0] === 'agent' && role === 'agent') {
+      breadcrumb = 'Agent';
+      if (segments[1]) {
+        breadcrumb += ` / ${segments[1].charAt(0).toUpperCase() + segments[1].slice(1)}`;
+      }
+    } else if (segments[0] === 'employee' && role === 'employee') {
+      breadcrumb = 'Employee';
+      if (segments[1]) {
+        breadcrumb += ` / ${segments[1].charAt(0).toUpperCase() + segments[1].slice(1)}`;
+      }
+    }
+    
+    return breadcrumb;
   };
 
   // Navigation links based on user role
@@ -105,11 +137,16 @@ const Navbar: React.FC = () => {
           <div className="hidden sm:ml-6 sm:flex sm:items-center">
             {session ? (
               <div className="flex items-center">
+                {getBreadcrumb() && (
+                  <span className="text-alliance-gray-500 mr-4 text-sm">
+                    {getBreadcrumb()}
+                  </span>
+                )}
                 <span className="text-alliance-gray-700 mr-4">
                   Hello, {session.user.name}
                 </span>
                 <button
-                  onClick={() => signOut({ callbackUrl: "/" })}
+                  onClick={() => signOut({ callbackUrl: "/login" })}
                   className="inline-flex items-center px-3 py-1.5 border border-alliance-red-600 text-sm font-medium rounded-md text-alliance-red-600 bg-white hover:bg-alliance-red-50"
                 >
                   Sign Out
@@ -210,7 +247,7 @@ const Navbar: React.FC = () => {
                 </div>
               </div>
               <button
-                onClick={() => signOut({ callbackUrl: "/" })}
+                onClick={() => signOut({ callbackUrl: "/login" })}
                 className="ml-auto flex-shrink-0 bg-white p-1 rounded-full text-alliance-gray-400 hover:text-alliance-gray-500"
               >
                 <span className="sr-only">Sign out</span>

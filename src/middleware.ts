@@ -67,6 +67,15 @@ export async function middleware(request: NextRequest) {
   if (isPublicRoute || isPublicApiRoute) {
     // If already logged in, redirect from login/register pages
     if (token && (pathname === "/login" || pathname.startsWith("/register"))) {
+      // Check approval status first
+      if (
+        token.role !== UserRole.ADMIN &&
+        token.role !== UserRole.USER &&
+        token.approvalStatus !== ApprovalStatus.APPROVED
+      ) {
+        return NextResponse.redirect(new URL("/approval", request.url));
+      }
+      
       // Redirect to appropriate dashboard based on role
       if (token.role === UserRole.ADMIN) {
         return NextResponse.redirect(new URL("/admin", request.url));
@@ -74,6 +83,8 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL("/agent", request.url));
       } else if (token.role === UserRole.EMPLOYEE) {
         return NextResponse.redirect(new URL("/employee", request.url));
+      } else {
+        return NextResponse.redirect(new URL("/", request.url));
       }
     }
 
