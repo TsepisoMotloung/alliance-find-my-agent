@@ -6,6 +6,7 @@ import Complaint from "./complaint";
 import Callback from "./callback";
 import sequelize from "@/lib/db";
 import Question from "./question"; // Added import for Question model
+import QuestionRating from "./questionRating";
 
 // Define associations
 User.hasOne(Agent, { foreignKey: "userId", as: "agent" });
@@ -40,7 +41,7 @@ Agent.hasMany(Callback, { foreignKey: "agentId", as: "callbacks" });
 Employee.belongsTo(User, { foreignKey: "userId", as: "user" });
 
 // Export models and sequelize
-export { sequelize, User, Agent, Employee, Rating, Complaint, Callback, Question };
+export { sequelize, User, Agent, Employee, Rating, Complaint, Callback, Question, QuestionRating };
 
 export default {
   sequelize,
@@ -51,4 +52,5 @@ export default {
   Complaint,
   Callback,
   Question,
+  QuestionRating,
 };

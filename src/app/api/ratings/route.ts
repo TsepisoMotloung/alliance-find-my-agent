@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
-import { Rating, User, Agent, Employee } from "@/models";
+import { Rating, User, Agent, Employee, Question, QuestionRating } from "@/models";
 import { v4 as uuidv4 } from "uuid";
 
 // Create a new rating
@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // Extract rating data
-    const { targetId, targetRole, raterName, raterEmail, score, comment } =
+    const { targetId, targetRole, raterName, raterEmail, score, comment, questionRatings } =
       body;
 
     // Validate required fields
@@ -81,6 +81,19 @@ export async function POST(request: NextRequest) {
       score: numericScore,
       comment,
     });
+
+    // Create question ratings if provided
+    if (questionRatings && Array.isArray(questionRatings)) {
+      const questionRatingPromises = questionRatings.map((qr: any) => 
+        QuestionRating.create({
+          id: uuidv4(),
+          ratingId: rating.id,
+          questionId: qr.questionId,
+          score: qr.rating,
+        })
+      );
+      await Promise.all(questionRatingPromises);
+    }
 
     // Return success response
     return NextResponse.json(

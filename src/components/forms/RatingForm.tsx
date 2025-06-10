@@ -122,6 +122,14 @@ const RatingForm: React.FC<RatingFormProps> = ({
         ratingComments.push(`Additional Comments: ${data.comment.trim()}`);
       }
 
+      // Prepare question ratings data
+      const questionRatingsData = questions
+        .filter(question => questionRatings[question.id] > 0)
+        .map(question => ({
+          questionId: question.id,
+          rating: questionRatings[question.id],
+        }));
+
       // Submit rating
       const ratingData = {
         targetId,
@@ -130,6 +138,7 @@ const RatingForm: React.FC<RatingFormProps> = ({
         raterEmail: data.raterEmail,
         score: overallRating,
         comment: ratingComments.length > 0 ? ratingComments.join('\n\n') : undefined,
+        questionRatings: questionRatingsData,
       };
 
       const ratingResponse = await fetch('/api/ratings', {
