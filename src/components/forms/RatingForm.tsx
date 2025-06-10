@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -23,6 +24,13 @@ interface FormValues {
   raterName: string;
   raterEmail: string;
   comment: string;
+  isComplaint: boolean;
+}
+
+interface QuestionRating {
+  questionId: string;
+  rating: number;
+  question: string;
 }
 
 const RatingForm: React.FC<RatingFormProps> = ({
@@ -33,17 +41,20 @@ const RatingForm: React.FC<RatingFormProps> = ({
 }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [rating, setRating] = useState(0);
   const [submitted, setSubmitted] = useState(false);
   const [questions, setQuestions] = useState<Question[]>([]);
-  const [questionAnswers, setQuestionAnswers] = useState<Record<string, string>>({});
+  const [questionRatings, setQuestionRatings] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
+    watch,
   } = useForm<FormValues>();
+
+  const watchComment = watch('comment');
+  const watchIsComplaint = watch('isComplaint');
 
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -52,6 +63,12 @@ const RatingForm: React.FC<RatingFormProps> = ({
         if (response.ok) {
           const data = await response.json();
           setQuestions(data.questions || []);
+          // Initialize ratings to 0 for all questions
+          const initialRatings: Record<string, number> = {};
+          data.questions?.forEach((question: Question) => {
+            initialRatings[question.id] = 0;
+          });
+          setQuestionRatings(initialRatings);
         }
       } catch (error) {
         console.error("Error fetching questions:", error);
@@ -63,17 +80,24 @@ const RatingForm: React.FC<RatingFormProps> = ({
     fetchQuestions();
   }, [targetRole]);
 
-  const handleQuestionAnswer = (questionId: string, answer: string) => {
-    setQuestionAnswers(prev => ({
+  const handleQuestionRating = (questionId: string, rating: number) => {
+    setQuestionRatings(prev => ({
       ...prev,
-      [questionId]: answer
+      [questionId]: rating
     }));
   };
 
+  const calculateOverallRating = (): number => {
+    const ratings = Object.values(questionRatings).filter(rating => rating > 0);
+    if (ratings.length === 0) return 0;
+    return Math.round(ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length);
+  };
+
   const onSubmit = async (data: FormValues) => {
-    // Validate rating
-    if (rating === 0) {
-      setSubmitError('Please select a rating');
+    // Validate that at least one question is rated
+    const ratedQuestions = Object.values(questionRatings).filter(rating => rating > 0);
+    if (questions.length > 0 && ratedQuestions.length === 0) {
+      setSubmitError('Please rate at least one question');
       return;
     }
 
@@ -81,32 +105,34 @@ const RatingForm: React.FC<RatingFormProps> = ({
     setSubmitError(null);
 
     try {
-      // Combine general comment with question answers
-      const allComments = [];
-      if (data.comment.trim()) {
-        allComments.push(data.comment.trim());
-      }
+      // Calculate overall rating from question ratings
+      const overallRating = calculateOverallRating();
 
-      // Add question answers to comments
+      // Prepare rating comments with question-specific ratings
+      const ratingComments: string[] = [];
       questions.forEach(question => {
-        const answer = questionAnswers[question.id];
-        if (answer && answer.trim()) {
-          allComments.push(`${question.question}: ${answer.trim()}`);
+        const rating = questionRatings[question.id];
+        if (rating > 0) {
+          ratingComments.push(`${question.question}: ${rating}/5 stars`);
         }
       });
 
-      // Prepare rating data
+      // Add general comment if provided
+      if (data.comment.trim()) {
+        ratingComments.push(`Additional Comments: ${data.comment.trim()}`);
+      }
+
+      // Submit rating
       const ratingData = {
         targetId,
         targetRole,
         raterName: data.raterName,
         raterEmail: data.raterEmail,
-        score: rating,
-        comment: allComments.length > 0 ? allComments.join('\n\n') : undefined,
+        score: overallRating,
+        comment: ratingComments.length > 0 ? ratingComments.join('\n\n') : undefined,
       };
 
-      // Submit rating
-      const response = await fetch('/api/ratings', {
+      const ratingResponse = await fetch('/api/ratings', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -114,10 +140,35 @@ const RatingForm: React.FC<RatingFormProps> = ({
         body: JSON.stringify(ratingData),
       });
 
-      const result = await response.json();
+      const ratingResult = await ratingResponse.json();
 
-      if (!response.ok) {
-        throw new Error(result.message || 'Failed to submit rating');
+      if (!ratingResponse.ok) {
+        throw new Error(ratingResult.message || 'Failed to submit rating');
+      }
+
+      // Submit complaint if checkbox is checked and comment is provided
+      if (data.isComplaint && data.comment.trim()) {
+        const complaintData = {
+          targetId,
+          targetRole,
+          complainantName: data.raterName,
+          complainantEmail: data.raterEmail,
+          subject: `Service Complaint - ${targetName}`,
+          description: data.comment.trim(),
+        };
+
+        const complaintResponse = await fetch('/api/complaints', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(complaintData),
+        });
+
+        // Don't fail the whole process if complaint submission fails
+        if (!complaintResponse.ok) {
+          console.warn('Failed to submit complaint, but rating was successful');
+        }
       }
 
       // Set submitted state to true
@@ -140,6 +191,9 @@ const RatingForm: React.FC<RatingFormProps> = ({
         <h3 className="text-lg font-semibold text-green-800 mb-2">Thank You!</h3>
         <p className="text-green-700">
           Your rating for {targetName} has been submitted successfully.
+          {watchIsComplaint && watchComment?.trim() && (
+            <span className="block mt-2">Your complaint has also been submitted for review.</span>
+          )}
         </p>
         <div className="mt-4">
           <Button onClick={() => window.location.href = '/'}>
@@ -157,21 +211,15 @@ const RatingForm: React.FC<RatingFormProps> = ({
         <p className="text-alliance-gray-600 text-sm mb-4">
           {targetRole === 'agent' ? 'Insurance Agent' : 'Alliance Employee'}
         </p>
-        <div className="flex justify-center mt-2">
-          <StarRating
-            value={rating}
-            onChange={setRating}
-            size="lg"
-          />
-        </div>
-        {rating > 0 && (
-          <p className="text-alliance-gray-700 mt-2">
-            {rating === 1 && 'Poor'}
-            {rating === 2 && 'Fair'}
-            {rating === 3 && 'Good'}
-            {rating === 4 && 'Very Good'}
-            {rating === 5 && 'Excellent'}
-          </p>
+        {calculateOverallRating() > 0 && (
+          <div className="flex justify-center mt-2">
+            <div className="text-center">
+              <StarRating value={calculateOverallRating()} readonly size="lg" />
+              <p className="text-alliance-gray-700 mt-2 text-sm">
+                Overall Rating: {calculateOverallRating()}/5
+              </p>
+            </div>
+          </div>
         )}
       </div>
 
@@ -195,41 +243,83 @@ const RatingForm: React.FC<RatingFormProps> = ({
         })}
         error={errors.raterEmail?.message}
       />
-        {/* Dynamic Questions */}
-        {loading ? (
-          <div className="text-center py-4">
-            <p className="text-alliance-gray-500">Loading questions...</p>
-          </div>
-        ) : questions.length > 0 ? (
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium text-alliance-gray-900">
-              Please answer the following questions:
-            </h3>
-            {questions.map((question) => (
-              <div key={question.id}>
-                <label className="block mb-1 text-sm font-medium text-alliance-gray-700">
-                  {question.question}
-                </label>
-                <textarea
-                  className="w-full px-4 py-2 bg-white border border-alliance-gray-300 rounded-md text-alliance-gray-900 placeholder-alliance-gray-400 focus:outline-none focus:ring-2 focus:border-alliance-red-300 focus:ring-alliance-red-500 transition duration-150"
-                  rows={3}
-                  value={questionAnswers[question.id] || ""}
-                  onChange={(e) => handleQuestionAnswer(question.id, e.target.value)}
-                ></textarea>
-              </div>
-            ))}
-          </div>
-        ) : null}
 
-      <div>
-        <label className="block mb-1 text-sm font-medium text-alliance-gray-700">
-          Comments (optional)
+      {/* Rating Questions */}
+      {loading ? (
+        <div className="text-center py-4">
+          <p className="text-alliance-gray-500">Loading questions...</p>
+        </div>
+      ) : questions.length > 0 ? (
+        <div className="space-y-6">
+          <h3 className="text-lg font-medium text-alliance-gray-900">
+            Please rate the following aspects:
+          </h3>
+          {questions.map((question) => (
+            <div key={question.id} className="bg-white border border-alliance-gray-200 rounded-lg p-4">
+              <label className="block mb-3 text-sm font-medium text-alliance-gray-700">
+                {question.question}
+              </label>
+              <div className="flex items-center justify-center">
+                <StarRating
+                  value={questionRatings[question.id] || 0}
+                  onChange={(rating) => handleQuestionRating(question.id, rating)}
+                  size="md"
+                />
+                {questionRatings[question.id] > 0 && (
+                  <span className="ml-3 text-sm text-alliance-gray-600">
+                    {questionRatings[question.id]}/5
+                  </span>
+                )}
+              </div>
+              {questionRatings[question.id] > 0 && (
+                <p className="text-center text-xs text-alliance-gray-500 mt-2">
+                  {questionRatings[question.id] === 1 && 'Poor'}
+                  {questionRatings[question.id] === 2 && 'Fair'}
+                  {questionRatings[question.id] === 3 && 'Good'}
+                  {questionRatings[question.id] === 4 && 'Very Good'}
+                  {questionRatings[question.id] === 5 && 'Excellent'}
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="bg-alliance-gray-50 p-4 rounded-md text-center">
+          <p className="text-alliance-gray-500">
+            No specific rating questions are configured for {targetRole}s.
+          </p>
+        </div>
+      )}
+
+      {/* Comments Section */}
+      <div className="space-y-3">
+        <label className="block text-sm font-medium text-alliance-gray-700">
+          Additional Comments (optional)
         </label>
         <textarea
           className="w-full px-4 py-2 bg-white border border-alliance-gray-300 rounded-md text-alliance-gray-900 placeholder-alliance-gray-400 focus:outline-none focus:ring-2 focus:border-alliance-red-300 focus:ring-alliance-red-500 transition duration-150"
           rows={4}
+          placeholder="Share any additional feedback..."
           {...register('comment')}
         ></textarea>
+        
+        {/* Complaint Checkbox */}
+        {watchComment && watchComment.trim() && (
+          <div className="flex items-start space-x-2">
+            <input
+              type="checkbox"
+              id="isComplaint"
+              className="mt-1 h-4 w-4 text-alliance-red-600 focus:ring-alliance-red-500 border-alliance-gray-300 rounded"
+              {...register('isComplaint')}
+            />
+            <label htmlFor="isComplaint" className="text-sm text-alliance-gray-700">
+              <span className="font-medium">Submit this comment as a complaint</span>
+              <span className="block text-xs text-alliance-gray-500 mt-1">
+                Check this box if your comment describes a problem or concern that requires attention from management.
+              </span>
+            </label>
+          </div>
+        )}
       </div>
 
       {submitError && (
