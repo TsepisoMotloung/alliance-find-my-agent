@@ -1,4 +1,6 @@
 {
-  "/admin/complaints/page": "app/admin/complaints/page.js",
-  "/admin/ratings/page": "app/admin/ratings/page.js"
+  "/admin/ratings/page": "app/admin/ratings/page.js",
+  "/admin/ratings/[id]/page": "app/admin/ratings/[id]/page.js",
+  "/admin/users/page": "app/admin/users/page.js",
+  "/_not-found/page": "app/_not-found/page.js"
 }
