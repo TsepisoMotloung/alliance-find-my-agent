@@ -9,9 +9,9 @@ export default function RegisterPage() {
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
           <div className="flex justify-center">
             <div className="h-8 w-8 rounded-md flex items-center justify-center overflow-hidden">
-              <img 
-                src="/images/Mappattern.jpg" 
-                alt="Logo" 
+              <img
+                src="/images/logo.png"
+                alt="Logo"
                 className="h-full w-full object-cover"
               />
             </div>

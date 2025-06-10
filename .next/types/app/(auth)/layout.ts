@@ -1,4 +1,4 @@
-// File: C:\Users\Hp-Pavilion Core-i5\Documents\test\test\alliance-find-my-agent\src\app\(auth)\layout.tsx
+// File: /home/runner/workspace/src/app/(auth)/layout.tsx
 import * as entry from '../../../../src/app/(auth)/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

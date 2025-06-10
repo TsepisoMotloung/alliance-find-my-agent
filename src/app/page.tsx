@@ -2,8 +2,8 @@ import React from "react";
 import Link from "next/link";
 import MainLayout from "@/components/layouts/MainLayout";
 import Button from "@/components/ui/Button";
-import { motion } from 'framer-motion';
-import { MapPin } from 'lucide-react';
+import { motion } from "framer-motion";
+import { MapPin } from "lucide-react";
 import AgentMapPlaceholder from "@/components/ui/AgentMapPlaceholder";
 
 export default function Home() {
@@ -25,24 +25,8 @@ export default function Home() {
                 <Button href="/map" size="lg">
                   Find Nearby Agents
                 </Button>
-                <Button href="/register" variant="outline" size="lg">
-                  Register as Agent
-                </Button>
               </div>
             </div>
-            {/* <div className="mt-12 md:mt-0 md:w-1/2"> */}
-              {/* Placeholder for hero image */}
-              {/* <div className="aspect-w-16 aspect-h-9 bg-alliance-gray-100 rounded-lg overflow-hidden shadow-lg">
-                <div className="w-full h-full flex items-center justify-center">
-                  <span className="text-alliance-gray-400">
-                    
-                  </span>
-                </div>
-              </div>
-            </div> */}
-
-            
-            
           </div>
         </div>
       </div>
@@ -169,14 +153,6 @@ export default function Home() {
                 className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-alliance-red-600 bg-white hover:bg-alliance-red-50"
               >
                 Find Agents
-              </Link>
-            </div>
-            <div className="ml-3 inline-flex rounded-md shadow">
-              <Link
-                href="/register/agent"
-                className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-alliance-red-700 hover:bg-alliance-red-800"
-              >
-                Join as Agent
               </Link>
             </div>
           </div>

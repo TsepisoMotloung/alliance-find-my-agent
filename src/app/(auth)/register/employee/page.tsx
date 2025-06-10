@@ -11,7 +11,7 @@ export default function EmployeeRegistrationPage() {
           <div className="flex justify-center">
             <div className="h-8 w-8 rounded-md flex items-center justify-center overflow-hidden">
               <img 
-                src="/images/Mappattern.jpg" 
+                src="/images/logo.png" 
                 alt="Logo" 
                 className="h-full w-full object-cover"
               />

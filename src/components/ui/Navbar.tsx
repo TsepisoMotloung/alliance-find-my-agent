@@ -75,9 +75,9 @@ const Navbar: React.FC = () => {
               <Link href="/" className="flex items-center">
                 {/* Logo placeholder */}
                 <div className="h-8 w-8 rounded-md flex items-center justify-center overflow-hidden">
-                  <img 
-                    src="/images/Mappattern.jpg" 
-                    alt="Logo" 
+                  <img
+                    src="/images/logo.png"
+                    alt="Logo"
                     className="h-full w-full object-cover"
                   />
                 </div>

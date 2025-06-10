@@ -1,9 +1,6 @@
 {
   "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
-  "/agent/location/page": "app/agent/location/page.js",
-  "/agent/qrcode/page": "app/agent/qrcode/page.js",
   "/page": "app/page.js",
-  "/admin/page": "app/admin/page.js",
   "/_not-found/page": "app/_not-found/page.js",
   "/(auth)/login/page": "app/(auth)/login/page.js"
 }

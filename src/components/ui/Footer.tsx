@@ -12,12 +12,12 @@ const Footer: React.FC = () => {
             <div className="flex items-center">
               {/* Logo placeholder */}
               <div className="h-8 w-8 rounded-md flex items-center justify-center overflow-hidden">
-                  <img 
-                    src="/images/Mappattern.jpg" 
-                    alt="Logo" 
-                    className="h-full w-full object-cover"
-                  />
-                </div>
+                <img
+                  src="/images/logo.png"
+                  alt="Logo"
+                  className="h-full w-full object-cover"
+                />
+              </div>
               <span className="ml-2 text-xl font-semibold text-alliance-gray-900">
                 Alliance Insurance
               </span>
@@ -51,18 +51,10 @@ const Footer: React.FC = () => {
               </li>
               <li>
                 <Link
-                  href="/register/agent"
+                  href="/rate/scan"
                   className="text-alliance-gray-600 hover:text-alliance-red-600"
                 >
-                  Register as Agent
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/register/employee"
-                  className="text-alliance-gray-600 hover:text-alliance-red-600"
-                >
-                  Register as Employee
+                  Scan QR Code
                 </Link>
               </li>
             </ul>
@@ -74,15 +66,13 @@ const Footer: React.FC = () => {
             </h3>
             <ul className="space-y-2">
               <li className="text-alliance-gray-600">
-                <span className="font-medium">Email:</span>{" "}
-                info@alliance-insurance.com
+                <span className="font-medium">Email:</span> info@alliance.co.ls
               </li>
               <li className="text-alliance-gray-600">
-                <span className="font-medium">Phone:</span> +1 (123) 456-7890
+                <span className="font-medium">Phone:</span>
               </li>
               <li className="text-alliance-gray-600">
-                <span className="font-medium">Address:</span> 123 Insurance Ave,
-                Business District, City
+                <span className="font-medium">Address:</span> Maseru, Lesotho
               </li>
             </ul>
           </div>

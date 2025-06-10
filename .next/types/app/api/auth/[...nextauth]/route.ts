@@ -1,4 +1,4 @@
-// File: C:\Users\Hp-Pavilion Core-i5\Documents\test\test\alliance-find-my-agent\src\app\api\auth\[...nextauth]\route.ts
+// File: /home/runner/workspace/src/app/api/auth/[...nextauth]/route.ts
 import * as entry from '../../../../../../src/app/api/auth/[...nextauth]/route.js'
 import type { NextRequest } from 'next/server.js'
 
