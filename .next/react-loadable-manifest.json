@@ -1,4 +1,11 @@
 {
+  "app/map/MapClient.tsx -> @/components/maps/AgentMap": {
+    "id": "app/map/MapClient.tsx -> @/components/maps/AgentMap",
+    "files": [
+      "static/css/_app-pages-browser_src_components_maps_AgentMap_tsx.css",
+      "static/chunks/_app-pages-browser_src_components_maps_AgentMap_tsx.js"
+    ]
+  },
   "app/rate/scan/ScanClient.tsx -> @/components/ui/QRScanner": {
     "id": "app/rate/scan/ScanClient.tsx -> @/components/ui/QRScanner",
     "files": [
